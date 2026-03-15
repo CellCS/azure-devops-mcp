@@ -50,6 +50,8 @@ The service is intentionally read-only and does not expose write/update endpoint
 
 ## MCP Configuration
 
+For **OpenCode**
+
 ```json
 "azure-devops-mcp": {
     "type": "remote",
@@ -57,6 +59,21 @@ The service is intentionally read-only and does not expose write/update endpoint
     "oauth": false,
     "headers": {
         "Authorization": "Bearer your-mcp-token-1"
+    }
+}
+```
+
+For **Cline**:
+
+```json
+"azure-devops-mcp": {
+    "autoApprove": [],
+    "disabled": false,
+    "timeout": 60,
+    "type": "streamableHttp",
+    "url": "http://127.0.0.1:8000/azure-devops-mcp",
+    "headers": {
+    "Authorization": "Bearer your-mcp-token-1"
     }
 }
 ```
@@ -73,7 +90,7 @@ The service is intentionally read-only and does not expose write/update endpoint
 
 ```text
 azure-devops-mcp/
-|- libs/
+|- app/
 |  |- config.py          # Environment configuration
 |  |- devops_client.py   # Azure DevOps REST client
 |  |- models.py          # Pydantic request models
@@ -88,7 +105,7 @@ azure-devops-mcp/
 
 - `MCP_BEARER_TOKENS` is required; startup fails if it is missing or empty
 - MCP requests require `Authorization: Bearer <token>`
-- Azure DevOps credentials are read from environment variables (`libs/config.py`)
+- Azure DevOps credentials are read from environment variables (`app/config.py`)
 - `AZURE_PROJECT`/`AZURE_PROJECT_ID` are not required; each tool call includes a `project`
 - Required Azure DevOps env vars are `AZURE_ORG` and `AZURE_PAT`
 - External access is expected through HTTPS at the reverse proxy
@@ -105,7 +122,7 @@ Latest generated evidence is under `security-scan-results/`.
 | Secret scanning | Repository scanned for leaked credentials | PASS | [`03-gitleaks_output.txt`](security-scan-results/03-gitleaks_output.txt), [`04-gitleaks.json`](security-scan-results/04-gitleaks.json) |
 | Container vulnerability scan | Image scanned with Trivy (critical vulnerabilities = 0) | PASS | [`05-trivy.txt`](security-scan-results/05-trivy.txt) |
 | SBOM generation | CycloneDX SBOM generated from container image | PASS | [`06-sbom-cyclonedx.json`](security-scan-results/06-sbom-cyclonedx.json) |
-| Full checklist report | Deployment controls summary for this run | PASS | [`controls_checklist.md`](security-scan-results/controls_checklist.md) |
+| Full checklist report | Deployment controls summary for this run | PASS | [`security_checklist.md`](security-scan-results/security_checklist.md) |
 
 ## Example chat prompts
 
@@ -115,10 +132,10 @@ Run the project-list prompt first, then reuse the exact returned project name in
 - `List all projects in this Azure DevOps organization.`
 - `Get work item 1234 details and summary in project "MyProject".`
 - `Run WIQL in project "MyProject" to list active Bugs assigned to me.`
-- `Get work item 1234 related work items in project "MyProject".`
 - `Get work item 1234 and its related work items in project "MyProject".`
 - `List all test steps for test case work item 13083 in project "MyProject".`
 - `Get pull request 1234 details in project "MyProject".`
+- List top 10 of 'Select [System.Id], [System.Title], [System.State] From WorkItems Where [System.WorkItemType] = 'Task' AND [State] <> 'Closed' AND [State] <> 'Removed' order by [Microsoft.VSTS.Common.Priority] asc, [System.CreatedDate] desc' in project "MyProject"
 
 ## WIQL request example
 

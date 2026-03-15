@@ -1,4 +1,4 @@
-# /libs/devops_client.py
+# /app/devops_client.py
 
 import html
 import re
@@ -143,7 +143,9 @@ class AzureDevOpsClient:
         response.raise_for_status()
         return response.json()
 
-    def get_work_item_with_relations(self, project: str, work_item_id: int) -> Dict[str, Any]:
+    def get_work_item_with_relations(
+        self, project: str, work_item_id: int
+    ) -> Dict[str, Any]:
         project_ref = self._project_ref(project)
         url = (
             f"{self.base_url}/{project_ref}"
@@ -219,8 +221,7 @@ class AzureDevOpsClient:
             }
 
         batch_data = self.get_work_items_batch(
-            project,
-            [info["id"] for info in related_ids_info]
+            project, [info["id"] for info in related_ids_info]
         )
         work_items_by_id = {
             item.get("id"): item for item in batch_data.get("value", [])
@@ -242,7 +243,9 @@ class AzureDevOpsClient:
             "related_work_items": related_work_items,
         }
 
-    def get_test_workitem_steps(self, project: str, work_item_id: int) -> Dict[str, Any]:
+    def get_test_workitem_steps(
+        self, project: str, work_item_id: int
+    ) -> Dict[str, Any]:
         work_item = self.get_work_item(project, work_item_id)
         fields = work_item.get("fields", {})
         work_item_type = fields.get("System.WorkItemType", "")
@@ -268,7 +271,9 @@ class AzureDevOpsClient:
             "test_steps": test_steps,
         }
 
-    def get_pull_request_by_id(self, project: str, pull_request_id: int) -> Dict[str, Any]:
+    def get_pull_request_by_id(
+        self, project: str, pull_request_id: int
+    ) -> Dict[str, Any]:
         project_ref = self._project_ref(project)
         url = (
             f"{self.base_url}/{project_ref}"

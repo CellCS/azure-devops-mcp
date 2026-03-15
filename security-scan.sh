@@ -39,7 +39,7 @@ docker run --rm \
 # Generate Deployment Controls Checklist Report
 # ------------------------------------------------------------
 
-CHECKLIST_FILE="./security-scan-results/controls_checklist.md"
+CHECKLIST_FILE="./security-scan-results/security_checklist.md"
 DATE=$(date "+%Y-%m-%d")
 
 echo "Generating deployment controls checklist..."

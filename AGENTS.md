@@ -7,7 +7,7 @@ Repository instructions for agentic coding assistants working in `azure-devops-m
 - Stack: FastAPI, FastMCP, Uvicorn, Requests, Pydantic Settings
 - Package/dependency manager: `uv`
 - Main entrypoint: `main.py`
-- Core modules: `libs/config.py`, `libs/devops_client.py`, `libs/models.py`
+- Core modules: `app/config.py`, `app/devops_client.py`, `app/models.py`
 - Purpose: read-only Azure DevOps MCP server
 
 ## 2) Rule Files (Cursor/Copilot)
@@ -60,11 +60,11 @@ There is no dedicated formatter/linter config yet in `pyproject.toml`.
 Use the following project-accepted checks.
 Syntax/build sanity:
 ```bash
-uv run python -m compileall main.py libs
+uv run python -m compileall main.py app
 ```
 Static security scan:
 ```bash
-uv run bandit -r libs main.py
+uv run bandit -r app main.py
 ```
 Dependency vulnerability scan:
 ```bash
@@ -99,10 +99,10 @@ uv run pytest tests/test_<module>.py::Test<ClassName>::test_<name>
 - Import grouping order: stdlib, third-party, local modules.
 - Use explicit imports; avoid wildcard imports.
 - Preserve existing import patterns:
-  - `main.py` imports via `from libs...`
-  - modules under `libs/` use relative imports where already used.
-- Keep request schemas in `libs/models.py`.
-- Keep Azure DevOps HTTP logic in `libs/devops_client.py`.
+  - `main.py` imports via `from app...`
+  - modules under `app/` use relative imports where already used.
+- Keep request schemas in `app/models.py`.
+- Keep Azure DevOps HTTP logic in `app/devops_client.py`.
 - Keep transport/middleware/tool registration in `main.py`.
 
 ## 9) Code Style: Formatting and Types
@@ -142,5 +142,5 @@ uv run pytest tests/test_<module>.py::Test<ClassName>::test_<name>
 - Update `README.md` when behavior/env/tooling changes.
 - If adding a tool, add a usage example prompt in `README.md`.
 - Before handoff, run at least:
-  - `uv run python -m compileall main.py libs`
+  - `uv run python -m compileall main.py app`
   - relevant security/test command(s) for touched areas.

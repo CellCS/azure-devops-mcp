@@ -5,9 +5,9 @@ from fastmcp.exceptions import ToolError
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from libs.devops_client import AzureDevOpsClient
-from libs.config import get_configured_mcp_tokens, get_mcp_http_path
-from libs.models import (
+from app.devops_client import AzureDevOpsClient
+from app.config import get_configured_mcp_tokens, get_mcp_http_path
+from app.models import (
     ProjectListRequest,
     PullRequestRequest,
     WiqlQueryRequest,
@@ -21,7 +21,15 @@ app = mcp.http_app(path=MCP_HTTP_PATH, transport="http")
 
 @app.middleware("http")
 async def require_bearer_token(request: Request, call_next):
-    if request.url.path == "/healthz":
+    path = request.url.path
+
+    if path == "/healthz":
+        return await call_next(request)
+
+    if path.startswith("/.well-known/"):
+        return await call_next(request)
+
+    if path == "/register":
         return await call_next(request)
 
     if request.method == "OPTIONS":
@@ -140,7 +148,9 @@ def get_related_work_item_info(request: WorkItemRequest):
     Retrieve related work items for a given work item ID from azure devops.
     """
     try:
-        return get_client().get_related_work_items(request.project, request.work_item_id)
+        return get_client().get_related_work_items(
+            request.project, request.work_item_id
+        )
 
     except Exception as e:
         raise ToolError(f"Failed to fetch related work item info: {e}") from e
@@ -150,7 +160,9 @@ def get_related_work_item_info(request: WorkItemRequest):
 def get_test_workitem_steps(request: WorkItemRequest):
     """Retrieve decoded test steps for a Test Case work item ID."""
     try:
-        return get_client().get_test_workitem_steps(request.project, request.work_item_id)
+        return get_client().get_test_workitem_steps(
+            request.project, request.work_item_id
+        )
     except Exception as e:
         raise ToolError(f"Failed to fetch test work item steps: {e}") from e
 
