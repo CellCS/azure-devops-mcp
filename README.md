@@ -24,6 +24,36 @@ Implemented today:
 
 ## Architecture overview
 
+Before connecting an MCP client:
+
+1. Copy env template:
+
+```bash
+cp .env.example .env
+```
+
+2. Edit `.env` and set at least:
+
+   - `AZURE_ORG` (your Azure DevOps organization name)
+   - `AZURE_PAT` (your Azure DevOps personal access token)
+   - `MCP_BEARER_TOKENS` (token used by MCP clients)
+
+3. Build the Docker image and start the MCP container:
+
+```bash
+sh deploy-container.sh
+```
+
+4. Verify the service is up:
+
+```bash
+curl http://127.0.0.1:8000/healthz
+```
+
+5. If the health check returns `{"status":"ok"}`, configure your MCP client to connect.
+
+For remote/VPS deployment, run the container behind an HTTPS reverse proxy and keep the service on a private network.
+
 The MCP server:
 
 - Manages authentication
@@ -135,7 +165,7 @@ Run the project-list prompt first, then reuse the exact returned project name in
 - `Get work item 1234 and its related work items in project "MyProject".`
 - `List all test steps for test case work item 13083 in project "MyProject".`
 - `Get pull request 1234 details in project "MyProject".`
-- List top 10 of 'Select [System.Id], [System.Title], [System.State] From WorkItems Where [System.WorkItemType] = 'Task' AND [State] <> 'Closed' AND [State] <> 'Removed' order by [Microsoft.VSTS.Common.Priority] asc, [System.CreatedDate] desc' in project "MyProject"
+- `List top 10 active tasks in project "MyProject" ordered by priority and created date using WIQL.`
 
 ## WIQL request example
 
