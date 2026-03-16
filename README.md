@@ -233,6 +233,20 @@ Guidelines:
 - Use `top` to cap result size for chat responses.
 - If full work item content is needed, query IDs first, then call `get_work_item_content`.
 
+## Security Scan Summary
+
+Status values below are examples from a successful run. Always check the latest generated report before release.
+
+| Scan | Status |
+|---|---|
+| Dependency Scan | PASS |
+| Static Security Scan | PASS |
+| Secret Scan | PASS |
+| Container Scan | PASS |
+| SBOM | PASS |
+
+Check [Security Scan](security-scan-results/security_checklist.md)
+
 ## References
 
 [Azure DevOps REST API](https://learn.microsoft.com/en-us/rest/api/azure/devops/wit/?view=azure-devops-rest-7.1)

@@ -1,24 +1,31 @@
 #!/bin/bash
 
+set -u
+set -o pipefail
+
+IMAGE_NAME="${IMAGE_NAME:-azure-devops-mcp:latest}"
+
 # all scan results will be stored in the security-scan-results directory
 rm -fr ./security-scan-results
 mkdir -p ./security-scan-results
 
 uv run pip-audit 2>&1 | tee ./security-scan-results/01-pip-audit.txt
+PIP_AUDIT_EXIT_CODE=${PIPESTATUS[0]}
 
 
 uv run bandit -r app main.py 2>&1 | tee ./security-scan-results/02-bandit.txt
+BANDIT_EXIT_CODE=${PIPESTATUS[0]}
 
 
-docker run --rm -v "$(pwd):/repo" zricethezav/gitleaks:latest detect --source /repo --report-format json --report-path /repo/security-scan-results/04-gitleaks.json 2>&1 | tee ./security-scan-results/03-gitleaks_output.txt
+docker run --rm -v "$(pwd):/repo" zricethezav/gitleaks:latest detect --source /repo --exit-code 1 --report-format json --report-path /repo/security-scan-results/04-gitleaks.json 2>&1 | tee ./security-scan-results/03-gitleaks_output.txt
+GITLEAKS_EXIT_CODE=${PIPESTATUS[0]}
 
-set -o pipefail
 docker run --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
   aquasec/trivy:latest image \
   --severity CRITICAL \
   --exit-code 1 \
-  azure-devops-mcp:latest 2>&1 | tee ./security-scan-results/05-trivy.txt
+  "$IMAGE_NAME" 2>&1 | tee ./security-scan-results/05-trivy.txt
 
 TRIVY_EXIT_CODE=${PIPESTATUS[0]}
 
@@ -32,8 +39,9 @@ docker run --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$(pwd):/repo" \
   anchore/syft:latest \
-  azure-devops-mcp:latest -o cyclonedx-json \
+  "$IMAGE_NAME" -o cyclonedx-json \
   > ./security-scan-results/06-sbom-cyclonedx.json
+SYFT_EXIT_CODE=$?
 
 # ------------------------------------------------------------
 # Generate Deployment Controls Checklist Report
@@ -52,17 +60,17 @@ TRIVY_STATUS="FAIL"
 SBOM_STATUS="FAIL"
 
 # Validate pip-audit
-if grep -q "No known vulnerabilities found" ./security-scan-results/01-pip-audit.txt 2>/dev/null; then
+if [ "${PIP_AUDIT_EXIT_CODE:-1}" -eq 0 ]; then
     PIP_AUDIT_STATUS="PASS"
 fi
 
 # Validate bandit
-if grep -q "No issues identified" ./security-scan-results/02-bandit.txt 2>/dev/null; then
+if [ "${BANDIT_EXIT_CODE:-1}" -eq 0 ]; then
     BANDIT_STATUS="PASS"
 fi
 
 # Validate gitleaks
-if grep -q "no leaks found" ./security-scan-results/03-gitleaks_output.txt 2>/dev/null; then
+if [ "${GITLEAKS_EXIT_CODE:-1}" -eq 0 ]; then
     GITLEAKS_STATUS="PASS"
 fi
 
@@ -72,7 +80,7 @@ if [ "${TRIVY_EXIT_CODE:-1}" -eq 0 ]; then
 fi
 
 # Validate SBOM
-if [ -f "./security-scan-results/06-sbom-cyclonedx.json" ]; then
+if [ "${SYFT_EXIT_CODE:-1}" -eq 0 ] && [ -f "./security-scan-results/06-sbom-cyclonedx.json" ]; then
     SBOM_STATUS="PASS"
 fi
 
@@ -80,7 +88,7 @@ cat <<EOF > $CHECKLIST_FILE
 # Deployment Controls Checklist
 
 Service: azure-devops-mcp  
-Framework: FastAPI + FastMCP
+Framework: FastAPI + FastMCP (Python 3.13)
 Deployment Model: Docker container behind reverse proxy
 Scan Date: $DATE  
 
