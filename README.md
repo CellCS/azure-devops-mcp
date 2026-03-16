@@ -3,6 +3,8 @@
 `azure-devops-mcp` is a Model Context Protocol (MCP) service built with FastAPI and FastMCP in Python.
 It exposes Azure DevOps work item operations as reusable tools for AI agents and developer tooling.
 
+![azure-devops-mcp archi](assets/az-devops-mcp.png)
+
 ## Purpose
 
 This service provides:
