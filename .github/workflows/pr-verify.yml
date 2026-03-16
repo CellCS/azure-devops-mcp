@@ -12,6 +12,11 @@ jobs:
   verify:
     name: Verify Python Project
     runs-on: ubuntu-latest
+    env:
+      AZURE_ORG: ci-placeholder-org
+      AZURE_PAT: ci-placeholder-pat
+      MCP_BEARER_TOKENS: ci-placeholder-token
+      MCP_HTTP_PATH: /azure-devops-mcp
 
     steps:
       - name: Checkout
