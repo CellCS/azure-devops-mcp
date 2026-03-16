@@ -131,29 +131,6 @@ azure-devops-mcp/
 `- README.md
 ```
 
-## Security model
-
-- `MCP_BEARER_TOKENS` is required; startup fails if it is missing or empty
-- MCP requests require `Authorization: Bearer <token>`
-- Azure DevOps credentials are read from environment variables (`app/config.py`)
-- `AZURE_PROJECT`/`AZURE_PROJECT_ID` are not required; each tool call includes a `project`
-- Required Azure DevOps env vars are `AZURE_ORG` and `AZURE_PAT`
-- External access is expected through HTTPS at the reverse proxy
-- The service itself only performs read-only Azure DevOps operations
-
-## Deployment controls checklist
-
-Latest generated evidence is under `security-scan-results/`.
-
-| Control | Requirement | Result | Evidence |
-|---|---|---|---|
-| Dependency vulnerability scan | Python dependencies scanned with pip-audit | PASS | [`01-pip-audit.txt`](security-scan-results/01-pip-audit.txt) |
-| Static code scan | Source code scanned using Bandit | PASS | [`02-bandit.txt`](security-scan-results/02-bandit.txt) |
-| Secret scanning | Repository scanned for leaked credentials | PASS | [`03-gitleaks_output.txt`](security-scan-results/03-gitleaks_output.txt), [`04-gitleaks.json`](security-scan-results/04-gitleaks.json) |
-| Container vulnerability scan | Image scanned with Trivy (critical vulnerabilities = 0) | PASS | [`05-trivy.txt`](security-scan-results/05-trivy.txt) |
-| SBOM generation | CycloneDX SBOM generated from container image | PASS | [`06-sbom-cyclonedx.json`](security-scan-results/06-sbom-cyclonedx.json) |
-| Full checklist report | Deployment controls summary for this run | PASS | [`security_checklist.md`](security-scan-results/security_checklist.md) |
-
 ## Example chat prompts
 
 Use these prompts when testing from an MCP-enabled chat client.
@@ -233,7 +210,15 @@ Guidelines:
 - Use `top` to cap result size for chat responses.
 - If full work item content is needed, query IDs first, then call `get_work_item_content`.
 
-## Security Scan Summary
+## Security model
+
+- `MCP_BEARER_TOKENS` is required; startup fails if it is missing or empty
+- MCP requests require `Authorization: Bearer <token>`
+- Azure DevOps credentials are read from environment variables (`app/config.py`)
+- `AZURE_PROJECT`/`AZURE_PROJECT_ID` are not required; each tool call includes a `project`
+- Required Azure DevOps env vars are `AZURE_ORG` and `AZURE_PAT`
+- External access is expected through HTTPS at the reverse proxy
+- The service itself only performs read-only Azure DevOps operations
 
 Status values below are examples from a successful run. Always check the latest generated report before release.
 
@@ -246,6 +231,23 @@ Status values below are examples from a successful run. Always check the latest 
 | SBOM | PASS |
 
 Check [Security Scan](security-scan-results/security_checklist.md)
+
+### Deployment controls checklist
+
+Latest generated evidence is under `security-scan-results/` by executing:
+
+```bash
+sh security-scan.sh
+```
+
+| Control | Requirement | Result | Evidence |
+|---|---|---|---|
+| Dependency vulnerability scan | Python dependencies scanned with pip-audit | PASS | [`01-pip-audit.txt`](security-scan-results/01-pip-audit.txt) |
+| Static code scan | Source code scanned using Bandit | PASS | [`02-bandit.txt`](security-scan-results/02-bandit.txt) |
+| Secret scanning | Repository scanned for leaked credentials | PASS | [`03-gitleaks_output.txt`](security-scan-results/03-gitleaks_output.txt), [`04-gitleaks.json`](security-scan-results/04-gitleaks.json) |
+| Container vulnerability scan | Image scanned with Trivy (critical vulnerabilities = 0) | PASS | [`05-trivy.txt`](security-scan-results/05-trivy.txt) |
+| SBOM generation | CycloneDX SBOM generated from container image | PASS | [`06-sbom-cyclonedx.json`](security-scan-results/06-sbom-cyclonedx.json) |
+| Full checklist report | Deployment controls summary for this run | PASS | [`security_checklist.md`](security-scan-results/security_checklist.md) |
 
 ## References
 
