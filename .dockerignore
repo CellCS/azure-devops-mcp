@@ -11,3 +11,4 @@ AGENTS.md
 security-scan.sh
 deploy-container.sh
 /security-scan-results/*.*
+assets/*.*
