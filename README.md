@@ -252,6 +252,9 @@ sh security-scan.sh
 ## References
 
 [Azure DevOps REST API](https://learn.microsoft.com/en-us/rest/api/azure/devops/wit/?view=azure-devops-rest-7.1)
+
 [Azure DevOps Core Projects API](https://learn.microsoft.com/en-us/rest/api/azure/devops/core/projects/list?view=azure-devops-rest-7.1&tabs=HTTP)
+
 [Azure DevOps WIQL Query By WIQL API](https://learn.microsoft.com/en-us/rest/api/azure/devops/wit/wiql/query-by-wiql?view=azure-devops-rest-7.1&tabs=HTTP)
+
 [microsoft azure-devops-mcp](https://github.com/microsoft/azure-devops-mcp)
