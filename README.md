@@ -65,7 +65,7 @@ The MCP server:
 `azure-devops-mcp` provides a single MCP endpoint that brokers read-only Azure DevOps access for AI clients.
 
 ```text
-MCP Client (OpenCode / Copilot / Open WebUI)
+MCP Client (OpenCode / Copilot / Cline / Antigravity / Claude Code)
         |
 HTTPS + Bearer token
         |
